@@ -3,7 +3,6 @@
 
 int main() {
     char eleccion;
-    colorear_fondo();
 
     // Leemos un carácter porque entonces a la hora de compararlo no vamos
     // a crashear todo el programa si un usuario introduce algo que no
@@ -22,12 +21,11 @@ int main() {
         scanf(" %c", &eleccion);
 
         switch(eleccion) {
-        case 1:
-            // empezar_juego();
-        case 2:
-            // creditos();
+        case '1':
             break;
-        case 3:
+        case '2':
+            break;
+        case '3':
             break;
         }
     }
