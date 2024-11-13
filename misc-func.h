@@ -7,6 +7,8 @@
 #if defined(_WIN32)
 #include <stdlib.h>
 #include <windows.h>
+#elif defined(__linux__)
+#include <unistd.h>
 #endif
 
 void clrscr() {
@@ -24,5 +26,15 @@ void colorear_fondo() {
     #elif defined(__linux__)
         printf("\033[1m");
         printf("\033[44m");
+    #endif
+}
+
+void esperar(int segundos) {
+    // La función Sleep, tal como está definida en "windows.h", toma un
+    // tiempo en milisegundos. Tampoco tiene el mismo nombre que en Linux.
+    #if defined(_WIN32)
+        Sleep(segundos * 1000);
+    #elif defined(__linux__)
+        sleep(segundos);
     #endif
 }

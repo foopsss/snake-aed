@@ -1,0 +1,11 @@
+# Regla para ignorar todo.
+*
+
+# Regla para no ignorar todo lo que tenga una extensión.
+!*.*
+
+# Regla para no ignorar directorios/carpetas.
+!*/
+
+# Regla para ignorar ejecutables de Windows.
+*.exe
