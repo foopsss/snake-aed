@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "misc-func.h"
+#include "tablero.h"
 
 int main() {
     char eleccion;
@@ -32,4 +33,3 @@ int main() {
 
     return 0;
 }
-

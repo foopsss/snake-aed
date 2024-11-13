@@ -21,6 +21,8 @@ void clrscr() {
 
 void colorear_fondo() {
     #if defined(_WIN32)
+        // En Windows, para poder hacer ciertas acciones por pantalla necesitamos
+        // "adueñarnos" de la terminal (en caso de que trabajemos con CMD.exe).
         HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
         SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | BACKGROUND_BLUE);
     #elif defined(__linux__)
