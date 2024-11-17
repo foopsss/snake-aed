@@ -4,18 +4,18 @@
 // el mismo sistema operativo, así que requerimos de ellas para poder crear
 // algo que funcione en todas las plataformas.
 
-#if defined(_WIN32)
 #include <stdlib.h>
+#if defined(_WIN32)
 #include <windows.h>
 #elif defined(__linux__)
 #include <unistd.h>
 #endif
 
-void clrscr() {
+void limpiar() {
     #if defined(_WIN32)
         system("cls");
     #elif defined(__linux__)
-        printf("\e[1;1H\e[2J");
+        system("clear");
     #endif
 }
 
