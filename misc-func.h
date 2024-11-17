@@ -19,18 +19,6 @@ void clrscr() {
     #endif
 }
 
-void colorear_fondo() {
-    #if defined(_WIN32)
-        // En Windows, para poder hacer ciertas acciones por pantalla necesitamos
-        // "adueñarnos" de la terminal (en caso de que trabajemos con CMD.exe).
-        HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-        SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | BACKGROUND_BLUE);
-    #elif defined(__linux__)
-        printf("\033[1m");
-        printf("\033[44m");
-    #endif
-}
-
 void esperar(int segundos) {
     // La función Sleep, tal como está definida en "windows.h", toma un
     // tiempo en milisegundos. Tampoco tiene el mismo nombre que en Linux.
