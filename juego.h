@@ -19,8 +19,11 @@
 ///////////////////////
 
 // Constantes para definir la velocidad del juego.
-#define FRAMERATE    64
-#define SPEED        150
+// Básicamente, cada ciclo cuenta 30 milisegundos hasta llegar al
+// valor de SPEED (también en milisegundos), lo que equivale a un
+// ciclo de juego.
+#define FRAMERATE    30
+#define SPEED        450
 
 // Constantes correspondientes a los signos a utilizar a la hora de dibujar
 // el tablero, la serpiente y la manzana.
@@ -63,23 +66,32 @@ int i, j;
 // ventana de la consola y modificar sus propiedades.
 HANDLE hConsole;
 
-void limpiar() {
-    system("cls");
-}
-
 void colorear_fondo() {
     // Ponemos el color de fondo de la consola en negro.
+    //
+    // Los valores del tipo "FOREGROUND..."/"BACKGROUND..."
+    // se tratan de canales que nos permiten elegir
+    // combinaciones de colores en un formato RGB.
+    //
+    // En este caso, no necesitamos especificar valores
+    // de tipo "BACKGROUND...", porque especificar los
+    // tres canales para el color del texto pone el
+    // color negro por defecto como el color del fondo.
     SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
 }
 
 void trazar_linea(int longitud) {
+    // Función simple para imprimir líneas.
+    // Lo usamos para nuestra interfaz gráfica.
     for (i = 0; i < longitud - 1; i++) {
-        printf("-");
+        printf("%c", BARRA_HOR);
     }
-    printf("-\n");
+    printf("%c\n", BARRA_HOR);
 }
 
 void presione_tecla() {
+    // getch() nos permite detener el programa hasta
+    // recibir un input.
     printf("Presione una tecla para continuar...");
     getch();
 }
@@ -88,6 +100,9 @@ void ocultar_cursor_consola(int flag) {
     CONSOLE_CURSOR_INFO cursorInfo;
     cursorInfo.dwSize = 100;
 
+    // En función del valor de la propiedad
+    // bVisible, el cursor va a mostrarse o
+    // no por pantalla.
     if (flag == 0) {
         cursorInfo.bVisible = FALSE;
     } else {
@@ -300,6 +315,10 @@ int colision_tablero() {
 
 int colision_serpiente(serpiente *serp) {
     if (serp != NULL) {
+        // Para cada elemento, controlamos si sus coordenadas
+        // coinciden o no con las coordenadas de la cabeza. En
+        // caso de que esto suceda, la serpiente ha colisionado
+        // consigo misma.
         if (cabeza -> x == serp -> x && cabeza -> y == serp -> y) {
             return 1;
         } else if (serp -> prox != NULL) {
@@ -308,6 +327,9 @@ int colision_serpiente(serpiente *serp) {
             return 0;
         }
     } else {
+        // Como nosotros le pasamos cabeza -> prox a la
+        // función, salir por esta condición implica que
+        // la serpiente no creció y solo tiene su cabeza.
         return 0;
     }
 }
@@ -373,10 +395,12 @@ void crear_manzana() {
 }
 
 void mostrar_manzana() {
+    // Establecemos como rojo el color del carácter a mostrar, que sería
+    // nuestra manzana. Luego lo imprimimos.
     SetConsoleTextAttribute(hConsole, FOREGROUND_INTENSITY | FOREGROUND_RED);
-
     gotoxy(manzana.x, manzana.y);
     printf("%c", O_MAYUSCULA);
 
+    // Devolvemos el color de los caracteres al valor normal.
     SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
 }

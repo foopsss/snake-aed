@@ -16,7 +16,7 @@ void cargar_puntuacion() {
     // de que termine la partida.
     char nombre_jugador[100];
 
-    limpiar();
+    system("cls");
 
     trazar_linea(110);
     printf("Perdiste.\n");
@@ -92,7 +92,7 @@ void jugar() {
 
     // Limpiamos la pantalla y ocultamos el cursor de la
     // consola para que se vea un poco mejor el juego.
-    limpiar();
+    system("cls");
     ocultar_cursor_consola(0);
 
     // Mostramos el tablero, creamos la serpiente y la
@@ -173,6 +173,8 @@ void jugar() {
                 digestion = 0;
             }
 
+            // Reiniciamos el tiempo para volver a realizar el ciclo
+            // de actualización.
             tiempo = 0;
         }
     }
@@ -196,7 +198,7 @@ void jugar() {
 }
 
 void instrucciones() {
-    limpiar();
+    system("cls");
     trazar_linea(110);
     printf("Para jugar al Snake deben respetarse 2 reglas basicas: \n");
     printf("\n");
@@ -204,7 +206,11 @@ void instrucciones() {
     printf("2. La serpiente no debe colisionar consigo misma.\n");
     printf("\n");
     printf("Si haces cualquiera de estas dos cosas, la serpiente va a morir!\n");
-    printf("Trata de comer todas las manzanas que puedas, para que la serpiente se vuelva mas larga.\n");
+    printf("Trata de comer todas las manzanas que puedas para que la serpiente se vuelva mas larga.\n");
+
+    trazar_linea(110);
+    printf("Por defecto, la serpiente se mueve hacia arriba.\n");
+    printf("Para cambiar la direccion, se deben utilizar las flechas del teclado.\n");
 
     trazar_linea(110);
     printf("SIMBOLOS\n");
@@ -241,7 +247,7 @@ void instrucciones() {
 void puntuaciones() {
     char ventana[200];
 
-    limpiar();
+    system("cls");
     puntos = fopen("puntuaciones.txt", "r");
     trazar_linea(110);
 
@@ -249,6 +255,9 @@ void puntuaciones() {
         printf("No hay puntuaciones cargadas.\n");
         printf("Luego de jugar algunas partidas vas a poder ver tus puntuaciones en el menu.\n");
     } else {
+        // Si el archivo existe, lo recorremos línea por línea
+        // e imprimimos cada una de ellas, ya que ahí se encuentran
+        // los puntajes de cada jugador.
         while(fgets(ventana, 100, puntos) != NULL) {
             printf("%s", ventana);
         }
@@ -260,6 +269,7 @@ void puntuaciones() {
 }
 
 int main() {
+    // Cambiamos el color de fondo de la terminal a negro.
     colorear_fondo();
 
     // En Windows, para poder hacer ciertas acciones por pantalla necesitamos
@@ -271,8 +281,11 @@ int main() {
     char eleccion;
 
     while (eleccion != '4') {
-        limpiar();
+        // Limpiamos la pantalla y ocultamos el cursor.
+        system("cls");
         ocultar_cursor_consola(0);
+        
+        // Mostramos el menú principal.
         trazar_linea(80);
         printf("Bienvenido/a al ");
         SetConsoleTextAttribute(hConsole, FOREGROUND_INTENSITY | FOREGROUND_GREEN);
