@@ -12,3 +12,6 @@ Estas versión tiene incorporada las funcionalidades básicas y comunes de cualq
 comer manzanas.
 
 También incorporamos un sistema de puntuación básico, que permite a los jugadores guardar sus puntajes, así como la máxima longitud que llegó a tener la serpiente en sus partidas.
+
+## Informe Técnico
+Desde [acá](https://docs.google.com/document/d/1h6XhwBlpBwTi9dpRz9Lel1f6QWEVF6j6EzNz_bh174Y) se puede acceder al informe técnico de la experiencia, solicitado por la cátedra.
