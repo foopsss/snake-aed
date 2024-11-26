@@ -1,0 +1,408 @@
+Acción Snake ES
+
+Ambiente
+
+    ////////////////////////
+    ///// Constantes. /////
+    ///////////////////////
+    
+    // Valores en milisegundos.
+    framerate = 30
+    velocidad = 450
+    
+    filas = 25
+    columnas = 80
+    
+    // Queremos mostrar el tablero algo alejado
+    // de los bordes de la pantalla.
+    pos_inicial_x = 5
+    pos_inicial_y = 5
+
+    /////////////////////////////////
+    ///// Estructuras de datos. /////
+    /////////////////////////////////
+    
+    Puntos = Registro
+        Nombre: AN(100)
+        Puntuación: N(3)
+        LongSerp: N(2)
+    Fin Registro
+    
+    ARCH: archivo de Puntos
+    REG: Puntos
+    
+    Coordenadas = Registro
+        x: N(2)
+        y: N(2)
+    Fin Registro
+    
+    Dirección, Manzana: Coordenadas
+    
+    tablero: arreglo de [1..filas, 1..columnas] de carácter
+    
+    Serpiente = Registro
+        tipo: N(1)
+        x: N(2)
+        y: N(2)
+        prox: puntero a Serpiente
+    Fin Registro
+    
+    cabeza: puntero a Serpiente
+    
+    //////////////////////
+    ///// Variables. /////
+    //////////////////////
+    
+    i, j, elección, puntaje, longitud, pos_ant_x_cola, pos_ant_y_cola, colisión_manzana: entero
+    
+    ///////////////////////////////////////
+    ///// Funciones y procedimientos. /////
+    ///////////////////////////////////////
+    
+    Procedimiento CargarTablero() ES
+        Para i := 1 hasta filas Hacer
+            Para j := 1 hasta columnas Hacer
+                tablero[i, j] := " "
+            Fin Para
+        Fin Para
+    Fin Procedimiento
+    
+    Procedimiento MostrarTablero(pos_x: entero, pos_y: entero) ES
+        CargarTablero()
+    
+        // Esto sería el equivalente del gotoxy que vamos a
+        // implementar en C para pararnos en ubicaciones
+        // específicas del tablero.
+        //
+        // A los efectos del pseudocódigo, lo vamos a considerar
+        // provisto por el sistema.
+        ir_a_xy(pos_x, pos_y)
+    
+        Para i := 1 hasta (filas + 1) Hacer
+            Si i = 1 o i = (filas + 1) Entonces
+                Si i = 1 Entonces
+                    Escribir("╔")
+                Contrario
+                    Escribir("╚")
+                Fin Si
+                
+                Para j := 1 hasta columnas Hacer
+                    Escribir("═")
+                Fin Para
+                
+                Si i = 1 Entonces
+                    Escribir("╗")
+                Contrario
+                    Escribir("╝")
+                Fin Si
+            Contrario
+                Escribir("║")
+                
+                Para j := 1 hasta columnas Hacer
+                    Escribir(tablero[i - 1, j])
+                Fin Para
+                
+                Escribir("║")
+            Fin Si
+            
+            pos_y := pos_y + 1
+            ir_a_xy(pos_x, pos_y)
+        Fin Para
+    Fin Procedimiento
+    
+    Procedimiento CrearCabezaSerpiente() ES
+        *cabeza.tipo := 0
+        *cabeza.x := columnas DIV 2
+        *cabeza.y := filas DIV 2
+        *cabeza.prox := NIL
+    Fin Procedimiento
+    
+    Procedimiento AlargarSerpiente(t: puntero a Serpiente, pos_x: entero, pos_y: entero) ES
+    Ambiente
+        p: puntero a Serpiente
+    Proceso
+        Si *t.prox = NIL Entonces
+            Nuevo(p)
+            *p.tipo := 1
+            *p.x := pos_x
+            *p.y := pos_y
+            *p.prox := NIL
+        Contrario
+            AlargarSerpiente(t, pos_x, pos_y)
+        Fin Si
+    Fin Procedimiento
+    
+    Procedimiento MostrarSerpiente(t: puntero a Serpiente) ES
+        ir_a_xy(*t.x, *t.y)
+        Escribir("*")
+        
+        Si *t.prox <> NIL Entonces
+            MostrarSerpiente(*t.prox)
+        Contrario
+            ir_a_xy(pos_ant_x_cola, pos_ant_y_cola)
+            Escribir(" ")
+        Fin Si
+    Fin Procedimiento
+    
+    Procedimiento MoverSerpiente(t: puntero a Serpiente, pos_x: entero, pos_y: entero) ES
+        Si *t.prox <> NIL Entonces
+            MoverSerpiente(*t.prox, *t.x, *t.y)
+        Contrario
+            pos_ant_x_cola := *t.x
+            pos_ant_y_cola := *t.y
+        Fin Si
+        
+        *t.x := pos_x
+        *t.y := pos_y
+    Fin Procedimiento
+    
+    Función ColisiónTablero(): entero ES
+    Ambiente
+        colisión_tab: entero
+    Proceso
+        colisión_tab := 0
+        
+        Si *cabeza.x = pos_inicial_x o *cabeza.x = (pos_inicial_x + columnas + 1) Entonces
+            colisión_tab := colisión_tab + 1
+        Fin Si
+
+        Si *cabeza.y = pos_inicial_y o *cabeza.x = (pos_inicial_y + filas + 1) Entonces
+            colisión_tab := colisión_tab + 1
+        Fin Si
+
+        ColisiónTablero := colisión_tab
+    Fin Función
+
+    Función ColisiónSerpiente(t: puntero a Serpiente): entero ES
+        Si t <> NIL Entonces
+            Si *cabeza.x = *t.x y *cabeza.y = *t.y Entonces
+                ColisiónSerpiente := 1
+            Contrario
+                Si *t.prox <> NIL Entonces
+                    ColisiónSerpiente(*t.prox)
+                Contrario
+                    ColisiónSerpiente := 0
+                Fin Si
+            Fin Si
+        Contrario
+            ColisiónSerpiente := 0
+        Fin Si
+    Fin Función
+    
+    Función ColisiónManzana(t: puntero a Serpiente): entero ES
+        Si t = cabeza Entonces
+            colisión_manzana := 0
+        Fin Si
+        
+        Si *t.x = Manzana.x y *t.y = Manzana.y Entonces
+            colisión_manzana := colisión_manzana + 1
+        Fin Si
+        
+        Si colisión_manzana = 0 Entonces
+            Si *t.prox <> NIL Entonces
+                ColisiónManzana(*t.prox)
+            Fin Si
+        Fin Si
+        
+        ColisiónManzana := colisión_manzana
+    Fin Función
+    
+    Procedimiento CrearManzana() ES
+        // A los efectos del pseudocódigo, consideramos que
+        // random es una función provista por el sistema que
+        // permite generar un número al azar entre 0 y una
+        // cota superior.
+        Manzana.x := pos_inicial_x + random(columnas) + 1;
+        Manzana.y := pos_inicial_y + random(filas) + 1;
+        
+        Si colisión_manzana(cabeza) <> 0 Entonces
+            CrearManzana()
+        Fin Si
+    Fin Procedimiento
+    
+    Procedimiento MostrarManzana() ES
+        ir_a_xy(Manzana.x, Manzana.y)
+        Escribir("O")
+    Fin Procedimiento
+    
+    Procedimiento CargarPuntuación() ES
+    Ambiente
+        nombre_jugador: AN(100)
+    Proceso
+        Escribir("Perdiste.")
+        Escribir("Recorda que no debes tocar los bordes del tablero ni hacer que la serpiente Colisióne consigo misma.")
+        Escribir("----------------------------------------------------------------------------------------------------")
+        Escribir("DATOS FINALES DE TU PARTIDA: ")
+        Escribir("Puntaje: " puntaje "puntos.")
+        Escribir("Longitud de la serpiente: " longitud "unidades.")
+        Escribir("")
+        Escribir("Estos datos van a ser grabados en un archivo llamado 'puntuaciones.txt', el cual se va a encontrar en")
+        Escribir("la misma carpeta que el ejecutable de este juego.")
+        Escribir("----------------------------------------------------------------------------------------------------")
+        Escribir("Antes de eso, por favor decinos como te llamas (100 caracteres como maximo).")
+        Escribir("Nombre: ")
+        Leer(nombre_jugador)
+        // Acá iría la lógica para confirmar si el archivo existe o no y decidir que hacer en función de eso.
+        Escribir("----------------------------------------------------------------------------------------------------")
+        Escribir("A continuacion, vas a ser devuelto/a al menu principal. Desde ahi podes volver a jugar, o revisar las")
+        Escribir("puntuaciones de partidas previas en la seccion 'Puntuaciones'.")
+    Fin Procedimiento
+    
+    Procedimiento LimpiarLista(t: puntero a Serpiente) ES
+    Ambiente
+        aux: puntero a Serpiente
+    Proceso
+        Mientras t <> NIL Hacer
+            aux := t
+            t := *t.prox
+            Disponer(aux)
+        Fin Mientras
+    Fin Procedimiento
+    
+    Procedimiento Jugar() ES
+    Ambiente
+        game_over, tecla, tiempo, digestión: entero
+    Proceso
+        puntaje := 0
+        longitud := 1
+        game_over := 0
+        tecla := 0
+        tiempo := 0
+        digestión := 0
+        Dirección.x := 0
+        Dirección.y := -1
+        
+        MostrarTablero(pos_inicial_x, pos_inicial_y)
+        CrearCabezaSerpiente()
+        CrearManzana()
+        MostrarSerpiente(cabeza)
+        MostrarManzana()
+        
+        Mientras game_over <> 1 Hacer
+            Si tecla_presionada() Entonces
+                // Asumamos que es una función interna a los
+                // propósitos del pseudocódigo...
+                tecla := obtener_tecla_presionada()
+                
+                // Asumamos también que ARRIBA, ABAJO, IZQUIERDA
+                // y DERECHA son constantes ya existentes.
+                Según tecla Hacer
+                    ARRIBA:
+                        Dirección.x = 0;
+                        Dirección.y = -1;
+                    ABAJO:
+                        Dirección.x = 0;
+                        Dirección.y = 1;
+                    DERECHA:
+                        Dirección.x = 1;
+                        Dirección.y = 0;
+                    IZQUIERDA:
+                        Dirección.x = -1;
+                        Dirección.y = 0;
+                Fin Según
+            Fin Si
+            
+            // Acá necesitamos una suerte de temporizador para
+            // marcar el ritmo del juego.
+            tiempo := tiempo + framerate
+            
+            Si tiempo >= velocidad Entonces
+                MostrarSerpiente(cabeza)
+                MostrarManzana()
+            
+                // Puntaje del jugador y longitud
+                // de la serpiente.
+                Escribir("Puntaje: " puntaje "puntos")
+                Escribir("Longitud de la serpiente: " longitud "unidad/es")
+                
+                MoverSerpiente(cabeza, *cabeza.x + Dirección.x, *cabeza.y + Dirección.y)
+            
+                Si ColisiónTablero() o ColisiónSerpiente(*cabeza.prox) o tecla = ESCAPE Entonces
+                    game_over := game_over + 1
+                Fin Si
+            
+                Si digestión = 0 Entonces
+                    Si ColisiónManzana(cabeza) <> 0 Entonces
+                        puntaje := puntaje + 10
+                        longitud := longitud + 1
+                        digestión := 1
+                    Fin Si
+                Contrario
+                    AlargarSerpiente(cabeza, Manzana.x, Manzana.y)
+                    CrearManzana()
+                    digestión := 0
+                Fin Si
+            
+                tiempo := 0
+            Fin Si
+        Fin Mientras
+        
+        CargarPuntuación()
+        LimpiarLista(cabeza)
+    Fin Procedimiento
+    
+    Procedimiento Instrucciones() ES
+        Escribir("Para jugar al Snake deben respetarse 2 reglas basicas: ")
+        Escribir("")
+        Escribir("1. No deben tocarse los bordes del tablero.")
+        Escribir("2. La serpiente no debe Colisiónar consigo misma.")
+        Escribir("")
+        Escribir("Si haces cualquiera de estas dos cosas, la serpiente va a morir!")
+        Escribir("Trata de comer todas las manzanas que puedas para que la serpiente se vuelva mas larga.")
+        Escribir("----------------------------------------------------------------------------------------")
+        Escribir("Por defecto, la serpiente se mueve hacia arriba.")
+        Escribir("Para cambiar la Dirección, se deben utilizar las flechas del teclado.")
+        Escribir("----------------------------------------------------------------------------------------")
+        Escribir("SÍMBOLOS")
+        Escribir("--------")
+        Escribir("- *: caracteres correspondientes al cuerpo y cabeza de la serpiente.")
+        Escribir("- O: caracter correspondiente a las manzanas que debe comer la serpiente.")
+    Fin Procedimiento
+    
+    Procedimiento Puntuaciones() ES
+        ABRIR E/ (ARCH)
+        LEER(ARCH, REG)
+        
+        Si FDA(ARCH) Entonces
+            // Si el archivo termina de entrada, es porque no existe.
+            Escribir("No hay puntuaciones cargadas.")
+            Escribir("Luego de jugar algunas partidas vas a poder ver tus puntuaciones en el menu.")
+        Contrario
+            // Acá mostraríamos los datos de cada jugador.
+            Mientras NFDA(ARCH) Hacer
+                Escribir("Nombre del jugador: " REG.Nombre)
+                Escribir("Puntuación: " REG.Puntuación)
+                Escribir("Longitud de la serpiente: " REG.LongSerp)
+                LEER(ARCH, REG)
+            Fin Mientras
+        Fin Si
+    Fin Procedimiento
+
+Proceso
+
+    Mientras elección <> 4 Hacer
+        Escribir("----------------------------------------------------------------------------------------")
+        Escribir("¡Bienvenido al Snake!")
+        Escribir("Esta es nuestra version del juego, producida por los siguientes estudiantes: ")
+        Escribir("Benchat Parra, Lucas Ivan")
+        Escribir("Fedorchuk, Francisco Nicolas")
+        Escribir("Romaniuk, Lucas Genaro")
+        Escribir("Yaya, Franco Gabriel")
+        Escribir("----------------------------------------------------------------------------------------")
+        Escribir("Cuenta con las siguientes opciones: \n")
+        Escribir("1. Jugar.")
+        Escribir("2. Instrucciones de juego.")
+        Escribir("3. Puntuaciones de partidas pasadas.")
+        Escribir("4. Salir.")
+        Escribir("")
+        Escribir("Escriba el número correspondiente a la opción que desee elegir: ")
+        Leer(elección)
+        
+        Según elección Hacer
+            = 1: Jugar()
+            = 2: Instrucciones()
+            = 3: Puntuaciones()
+        Fin Según
+    Fin Mientras
+
+Fin Acción
