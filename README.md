@@ -15,3 +15,6 @@ También incorporamos un sistema de puntuación básico, que permite a los jugad
 
 ## Informe Técnico
 Desde [acá](https://docs.google.com/document/d/1h6XhwBlpBwTi9dpRz9Lel1f6QWEVF6j6EzNz_bh174Y) se puede acceder al informe técnico de la experiencia, solicitado por la cátedra.
+
+## Video de YouTube
+Desde [acá](https://www.youtube.com/watch?v=VxtBKQS-OE4) se puede acceder a la demostración en video solicitada por la cátedra.
